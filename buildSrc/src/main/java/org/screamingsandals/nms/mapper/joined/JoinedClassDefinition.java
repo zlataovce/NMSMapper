@@ -19,7 +19,7 @@ public class JoinedClassDefinition {
     private final ObjectList<JoinedConstructor> constructors = new ObjectArrayList<>();
     private final ObjectList<JoinedMethod> methods = new ObjectArrayList<>();
 
-    private transient final Object2ObjectMap<String, String> pathKeys = new Object2ObjectOpenHashMap<>();
+    private transient final Object2ObjectOpenHashMap<String, String> pathKeys = new Object2ObjectOpenHashMap<>();
 
     @Data
     public static class JoinedField {
