@@ -1,6 +1,8 @@
 package org.screamingsandals.nms.generator;
 
 import com.squareup.javapoet.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
@@ -59,7 +61,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
 
         var accessorUtils = ClassName.get(basePackage, "AccessorUtils");
 
-        var classAccessors = new HashMap<String, Map.Entry<String, TypeSpec.Builder>>();
+        var classAccessors = new Object2ObjectOpenHashMap<String, Map.Entry<String, TypeSpec.Builder>>();
 
         // First iteration: adding required classes and their fields
         neeededClasses.forEach(requiredClass -> {
@@ -91,7 +93,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
                     .build();
             builder.addMethod(typeMethod);
 
-            var nameCounter = new HashMap<String, Integer>();
+            var nameCounter = new Object2ObjectOpenHashMap<String, Integer>();
 
             requiredClass.getFields().forEach(s1 -> {
                 var split = s1.split(":");
@@ -268,7 +270,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
                 builder.addMethod(method);
             });
 
-            var nameCounter = new HashMap<String, Integer>();
+            var nameCounter = new Object2ObjectOpenHashMap<String, Integer>();
 
             requiredClass.getMethods().forEach(method -> {
                 var classes = Arrays.stream(method.getValue())
@@ -283,7 +285,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
                                 return s;
                             }
                         })
-                        .collect(Collectors.toList());
+                        .collect(ObjectImmutableList.toList());
 
                 var params = Arrays.stream(method.getValue())
                         .map(s -> {
@@ -297,7 +299,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
                                 return s;
                             }
                         })
-                        .collect(Collectors.toList());
+                        .collect(ObjectImmutableList.toList());
 
                 var split = method.getKey().split(":");
                 var type = "MOJANG";
@@ -403,7 +405,7 @@ public abstract class GenerateClassesTask extends DefaultTask {
         Files.writeString(ac.toPath(), "package " + basePackage + ";\n\n" + str, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-    private void addMissingClasses(String basePackage, BasicConfigurationNode joinedMappings, BasicConfigurationNode mojangClassNameTranslate, BasicConfigurationNode spigotClassNameTranslate, ClassName accessorUtils, HashMap<String, Map.Entry<String, TypeSpec.Builder>> classAccessors, String str) {
+    private void addMissingClasses(String basePackage, BasicConfigurationNode joinedMappings, BasicConfigurationNode mojangClassNameTranslate, BasicConfigurationNode spigotClassNameTranslate, ClassName accessorUtils, Object2ObjectOpenHashMap<String, Map.Entry<String, TypeSpec.Builder>> classAccessors, String str) {
         if (str.startsWith("&")) {
             String translated2;
             if (str.startsWith("&spigot:")) {
@@ -450,9 +452,9 @@ public abstract class GenerateClassesTask extends DefaultTask {
                 .stream()
                 .flatMap(entry -> Arrays.stream(entry.getKey().toString().split(",")).map(s1 -> Map.entry(s1, entry.getValue().getString(""))))
                 .sorted(Comparator.comparing(o -> VersionNumber.parse(o.getKey())))
-                .collect(Collectors.toList());
+                .collect(ObjectImmutableList.toList());
 
-        // currently support spigot and searge. vanilla servers are not supported
+        // currently supports spigot and searge. vanilla servers are not supported
         var spigotLatest = new AtomicReference<String>();
 
         var allSpigotMappings = node.node("SPIGOT").childrenMap().entrySet()

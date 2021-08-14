@@ -1,5 +1,8 @@
 package org.screamingsandals.nms.mapper.tasks;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
@@ -16,7 +19,8 @@ import org.spongepowered.configurate.gson.GsonConfigurationLoader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class DocsGenerationTask extends DefaultTask {
@@ -35,17 +39,21 @@ public abstract class DocsGenerationTask extends DefaultTask {
 
         outputFolder.mkdirs();
 
-        versions.forEach((version, defaultMapping) -> {
+        versions.object2ObjectEntrySet().fastForEach(versionEntry -> {
+            var version = versionEntry.getKey();
+            var defaultMapping = versionEntry.getValue();
             System.out.println("Generating docs for version " + version);
 
-            var searchIndex = new ArrayList<Map<String, String>>();
+            var searchIndex = new ObjectArrayList<Map<String, String>>();
 
             var versionDirectory = new File(outputFolder, version);
             versionDirectory.mkdirs();
 
-            var packages = new HashMap<String, List<Map.Entry<ClassDefinition.Type, String>>>();
+            var packages = new Object2ObjectOpenHashMap<String, ObjectList<Map.Entry<ClassDefinition.Type, String>>>();
 
-            mappings.get(version).forEach((key, classDefinition) -> {
+            mappings.get(version).object2ObjectEntrySet().fastForEach(mappingEntry -> {
+                var key = mappingEntry.getKey();
+                var classDefinition = mappingEntry.getValue();
                 var key2 = classDefinition.getMapping().getOrDefault(defaultMapping, key);
 
                 var pathKey = key2
@@ -55,7 +63,7 @@ public abstract class DocsGenerationTask extends DefaultTask {
                 var packageStr = key2.lastIndexOf(".") == -1 ? "default-pkg" : key2.substring(0, key2.lastIndexOf("."));
 
                 if (!packages.containsKey(packageStr)) {
-                    packages.put(packageStr, new ArrayList<>());
+                    packages.put(packageStr, new ObjectArrayList<>());
                 }
 
                 if (packageStr.equals("default-pkg")) {
@@ -84,7 +92,9 @@ public abstract class DocsGenerationTask extends DefaultTask {
                 }
             });
 
-            packages.forEach((key, paths) -> {
+            packages.object2ObjectEntrySet().fastForEach(packageEntry -> {
+                var key = packageEntry.getKey();
+                var paths = packageEntry.getValue();
                 var pathKey = key
                         .replace(".", "/")
                         .replace("${V}", "VVV");
@@ -132,7 +142,9 @@ public abstract class DocsGenerationTask extends DefaultTask {
 
         System.out.println("Generating classes history");
 
-        getUtils().get().getJoinedMappings().forEach((s, m) -> {
+        getUtils().get().getJoinedMappings().object2ObjectEntrySet().fastForEach(joinedMappingEntry -> {
+            var s = joinedMappingEntry.getKey();
+            var m = joinedMappingEntry.getValue();
             var finalHtml = new File(outputFolder, "history/" + s + ".html");
             finalHtml.getParentFile().mkdirs();
 

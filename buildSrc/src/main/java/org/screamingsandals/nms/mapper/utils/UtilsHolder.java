@@ -1,5 +1,8 @@
 package org.screamingsandals.nms.mapper.utils;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.Data;
 import org.screamingsandals.nms.mapper.joined.JoinedClassDefinition;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
@@ -7,21 +10,18 @@ import org.screamingsandals.nms.mapper.single.MappingType;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Data
 public class UtilsHolder {
-    private final Map<String, Map<String, ClassDefinition>> mappings = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, Object2ObjectOpenHashMap<String, ClassDefinition>> mappings = new Object2ObjectOpenHashMap<>();
     private final File resourceDir;
-    private final Map<String, MappingType> newlyGeneratedMappings = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, MappingType> newlyGeneratedMappings = new Object2ObjectOpenHashMap<>();
     private final AtomicReference<ConfigurationNode> versionManifest = new AtomicReference<>();
-    private final Map<String, String> joinedMappingsClassLinks = new HashMap<>();
-    private final Map<String, JoinedClassDefinition> joinedMappings = new HashMap<>();
-    private final Map<String, String> spigotJoinedMappingsClassLinks = new HashMap<>();
-    private final List<String> undefinedClassLinks = new ArrayList<>();
-    private final Map<Map.Entry<String, MappingType>, String> licenses = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> joinedMappingsClassLinks = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, JoinedClassDefinition> joinedMappings = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> spigotJoinedMappingsClassLinks = new Object2ObjectOpenHashMap<>();
+    private final ObjectList<String> undefinedClassLinks = new ObjectArrayList<>();
+    private final Object2ObjectOpenHashMap<Map.Entry<String, MappingType>, String> licenses = new Object2ObjectOpenHashMap<>();
 }

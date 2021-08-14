@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.spongepowered:configurate-gson:4.1.1'
     implementation 'com.squareup:javapoet:1.13.0'
     implementation 'commons-io:commons-io:2.10.0'
+    implementation 'it.unimi.dsi:fastutil:8.5.4'
 }
 
 sourceCompatibility = '11.0'

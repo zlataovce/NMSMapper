@@ -1,5 +1,6 @@
 package org.screamingsandals.nms.mapper;
 
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.SneakyThrows;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -12,7 +13,6 @@ import org.spongepowered.configurate.gson.GsonConfigurationLoader;
 
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NMSMapper implements Plugin<Project> {
@@ -59,7 +59,7 @@ public class NMSMapper implements Plugin<Project> {
                             }
                     )
                     .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                    .collect(ObjectImmutableList.toList());
 
             if (!versions.isEmpty()) {
                 versions.forEach(version -> {

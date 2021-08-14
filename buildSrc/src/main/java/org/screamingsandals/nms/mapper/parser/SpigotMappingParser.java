@@ -1,5 +1,7 @@
 package org.screamingsandals.nms.mapper.parser;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.SneakyThrows;
 import org.screamingsandals.nms.mapper.extension.Version;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
@@ -13,7 +15,7 @@ import java.util.regex.Pattern;
 // TODO: convert this mess to AnyMappingParser
 public class SpigotMappingParser {
     @SneakyThrows
-    public static String mapTo(Version version, Map<String, ClassDefinition> map, List<String> excluded, ErrorsLogger errorsLogger) {
+    public static String mapTo(Version version, Object2ObjectOpenHashMap<String, ClassDefinition> map, ObjectList<String> excluded, ErrorsLogger errorsLogger) {
         var workspace = version.getWorkspace();
 
         var cl = Files.readString(workspace.getFile(Objects.requireNonNull(version.getSpigotClassMappings()), "bukkit-cl.csrg").toPath());
@@ -56,7 +58,7 @@ public class SpigotMappingParser {
             spigotToValue.put(split[1], map.get(split[0]));
 
             // Filtering nested classes
-            map.entrySet()
+            map.object2ObjectEntrySet()
                     .stream()
                     .filter(entry -> entry.getKey().startsWith(split[0] + "$") && !entry.getValue().getMapping().containsKey(MappingType.SPIGOT))
                     .forEach(entry -> {
@@ -243,7 +245,7 @@ public class SpigotMappingParser {
         return cl.lines().findFirst().map(e -> e.substring(1).trim()).orElse(null);
     }
 
-    public static boolean isImplementing(Map<String,ClassDefinition> map, ClassDefinition definition, ClassDefinition.Link self) {
+    public static boolean isImplementing(Object2ObjectOpenHashMap<String, ClassDefinition> map, ClassDefinition definition, ClassDefinition.Link self) {
         if (definition.getSuperclass().equals(self) || definition.getInterfaces().contains(self)) {
             return true;
         }

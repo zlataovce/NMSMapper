@@ -1,5 +1,9 @@
 package org.screamingsandals.nms.mapper.parser;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.generic.Type;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
@@ -12,9 +16,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 public class VanillaJarParser {
-    public static Map.Entry<Map<String, ClassDefinition>, List<String>> map(File vanillaJar) throws IOException {
-        var map = new HashMap<String, ClassDefinition>();
-        var excludedSynthetic = new ArrayList<String>();
+    public static Map.Entry<Object2ObjectOpenHashMap<String, ClassDefinition>, ObjectList<String>> map(File vanillaJar) throws IOException {
+        var map = new Object2ObjectOpenHashMap<String, ClassDefinition>();
+        var excludedSynthetic = new ObjectArrayList<String>();
 
         try (var zip = new ZipFile(vanillaJar)) {
             var entries = zip.stream()
@@ -30,7 +34,7 @@ public class VanillaJarParser {
                     .filter(Objects::nonNull)
                     .filter(e -> !e.isAnonymous() && !e.isSynthetic())
                     .filter(e -> !e.getClassName().equals("net.minecraft.data.Main")) // net.minecraft.data.Main is excluded from custom servers
-                    .collect(Collectors.toList());
+                    .collect(ObjectImmutableList.toList());
 
             entries.forEach(javaClass -> {
                 var definition = new ClassDefinition();

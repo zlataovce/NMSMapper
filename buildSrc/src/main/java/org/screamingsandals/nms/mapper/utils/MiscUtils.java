@@ -4,62 +4,19 @@ import j2html.tags.DomContent;
 import org.screamingsandals.nms.mapper.single.MappingType;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static j2html.TagCreator.*;
+import static j2html.TagCreator.div;
+import static j2html.TagCreator.span;
 
 public class MiscUtils {
     public static String getModifierString(int modifier) {
-        var modifiers = new ArrayList<String>();
-
-        if (Modifier.isPublic(modifier)) {
-            modifiers.add("public");
+        final List<String> modifiers = Arrays.stream(Modifier.toString(modifier).split(" ")).collect(Collectors.toList());
+        if (modifiers.contains("interface")) {
+            modifiers.remove("abstract");
         }
-
-        if (Modifier.isPrivate(modifier)) {
-            modifiers.add("private");
-        }
-
-        if (Modifier.isProtected(modifier)) {
-            modifiers.add("protected");
-        }
-
-        if (Modifier.isStatic(modifier)) {
-            modifiers.add("static");
-        }
-
-        if (Modifier.isAbstract(modifier) && !Modifier.isInterface(modifier)) { // we all know interfaces are abstract
-            modifiers.add("abstract");
-        }
-
-        if (Modifier.isFinal(modifier)) {
-            modifiers.add("final");
-        }
-
-        if (Modifier.isNative(modifier)) {
-            modifiers.add("native");
-        }
-
-        if (Modifier.isStrict(modifier)) {
-            modifiers.add("strict");
-        }
-
-        if (Modifier.isSynchronized(modifier)) {
-            modifiers.add("synchronized");
-        }
-
-        if (Modifier.isTransient(modifier)) {
-            modifiers.add("transient");
-        }
-
-        if (Modifier.isVolatile(modifier)) {
-            modifiers.add("volatile");
-        }
-
-        if (!modifiers.isEmpty()) {
-            modifiers.add("");
-        }
-
         return String.join(" ", modifiers);
     }
 

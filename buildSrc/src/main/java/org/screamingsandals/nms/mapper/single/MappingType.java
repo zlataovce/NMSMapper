@@ -4,5 +4,5 @@ public enum MappingType {
     MOJANG,
     OBFUSCATED, // sometimes referred as NOTCH
     SPIGOT,
-    SEARGE; // read from MCPConfig
+    SEARGE // read from MCPConfig
 }

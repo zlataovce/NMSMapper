@@ -1,14 +1,14 @@
 package org.screamingsandals.nms.generator;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Data
 public class ClassGeneratorExtension {
-    private final List<RequiredClass> neededClasses = new ArrayList<>();
+    private final ObjectList<RequiredClass> neededClasses = new ObjectArrayList<>();
 
     private String sourceSet = "src/main/java";
     private String basePackage = "com.example.nms";
@@ -23,10 +23,10 @@ public class ClassGeneratorExtension {
     @Data
     public static class RequiredClass {
         private final String clazz;
-        private final List<String> fields = new ArrayList<>();
-        private final List<String> enumFields = new ArrayList<>();
-        private final List<Map.Entry<String, String[]>> methods = new ArrayList<>();
-        private final List<String[]> constructors = new ArrayList<>();
+        private final ObjectList<String> fields = new ObjectArrayList<>();
+        private final ObjectList<String> enumFields = new ObjectArrayList<>();
+        private final ObjectList<Map.Entry<String, String[]>> methods = new ObjectArrayList<>();
+        private final ObjectList<String[]> constructors = new ObjectArrayList<>();
 
         public RequiredClass reqField(String field) {
             fields.add(field);

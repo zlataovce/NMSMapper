@@ -1,5 +1,7 @@
 package org.screamingsandals.nms.mapper.tasks;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import lombok.SneakyThrows;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Property;
@@ -20,7 +22,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public abstract class JoinedMappingTask extends DefaultTask {
     private static MessageDigest digest;
@@ -45,13 +46,13 @@ public abstract class JoinedMappingTask extends DefaultTask {
                     .stream()
                     .map(String::trim)
                     .filter(s -> !s.isBlank() && !s.startsWith("#"))
-                    .collect(Collectors.toList());
+                    .collect(ObjectImmutableList.toList());
 
         var versions = getUtils().get().getNewlyGeneratedMappings()
                 .keySet()
                 .stream()
                 .sorted(Comparator.comparing(VersionNumber::parse).reversed())
-                .collect(Collectors.toList());
+                .collect(ObjectImmutableList.toList());
 
         var mappings = getUtils().get().getMappings();
 
@@ -65,29 +66,30 @@ public abstract class JoinedMappingTask extends DefaultTask {
 
             System.out.println("Applying version " + version);
 
-            mappings.get(version).forEach((key, classDefinition) -> {
+            mappings.get(version).object2ObjectEntrySet().forEach(mappingsEntry -> {
+                var classDefinition = mappingsEntry.getValue();
                 try {
                     var finalClassName = getJoinedClassName(classDefinition, spigotForceMerge);
                     if (!finalMapping.containsKey(finalClassName)) {
                         finalMapping.put(finalClassName, new JoinedClassDefinition());
                     }
                     var definition = finalMapping.get(finalClassName);
-                    classDefinition.getMapping().forEach((mappingType, s) -> definition.getMapping()
-                            .entrySet()
+                    classDefinition.getMapping().object2ObjectEntrySet().fastForEach(classDefinitionEntry -> definition.getMapping()
+                            .object2ObjectEntrySet()
                             .stream()
-                            .filter(entry -> entry.getValue().equals(s) && entry.getKey().getValue() == mappingType)
+                            .filter(entry -> entry.getValue().equals(classDefinitionEntry.getValue()) && entry.getKey().getValue() == classDefinitionEntry.getKey())
                             .findFirst()
                             .ifPresentOrElse(entry -> {
                                 definition.getMapping().remove(entry.getKey());
                                 definition.getMapping().put(Map.entry(entry.getKey().getKey() + "," + version, entry.getKey().getValue()), entry.getValue());
-                            }, () -> definition.getMapping().put(Map.entry(version, mappingType), s)));
+                            }, () -> definition.getMapping().put(Map.entry(version, classDefinitionEntry.getKey()), classDefinitionEntry.getValue())));
 
                     classDefinition.getConstructors().forEach(constructorDefinition -> definition.getConstructors()
                             .stream()
                             .filter(joinedConstructor -> constructorDefinition.getParameters()
                                     .stream()
                                     .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                    .collect(Collectors.toList())
+                                    .collect(ObjectImmutableList.toList())
                                     .equals(joinedConstructor.getParameters())
                             )
                             .findFirst()
@@ -97,11 +99,12 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                 constructor.getParameters().addAll(constructorDefinition.getParameters()
                                         .stream()
                                         .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                        .collect(Collectors.toList()));
+                                        .collect(ObjectImmutableList.toList()));
                                 definition.getConstructors().add(constructor);
                             }));
 
-                    classDefinition.getFields().forEach((s, fieldDefinition) -> {
+                    classDefinition.getFields().object2ObjectEntrySet().forEach(classDefinitionEntry -> {
+                        var fieldDefinition = classDefinitionEntry.getValue();
                         definition.getFields()
                                 .stream()
                                 .filter(joinedField -> joinedField.getType().equals(remapParameterType(version, fieldDefinition.getType(), spigotForceMerge))
@@ -110,7 +113,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                 .findFirst()
                                 .ifPresentOrElse(joinedField -> fieldDefinition.getMapping()
                                         .forEach((mappingType, s3) -> joinedField.getMapping()
-                                                .entrySet()
+                                                .object2ObjectEntrySet()
                                                 .stream()
                                                 .filter(entry -> entry.getValue().equals(s3) && entry.getKey().getValue() == mappingType)
                                                 .findFirst()
@@ -136,27 +139,27 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                         && methodDefinition.getParameters()
                                         .stream()
                                         .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                        .collect(Collectors.toList())
+                                        .collect(ObjectImmutableList.toList())
                                         .equals(joinedMethod.getParameters()))
                                 .findFirst()
-                                .ifPresentOrElse(joinedMethod -> methodDefinition.getMapping()
-                                        .forEach((mappingType, s3) -> joinedMethod.getMapping()
-                                                .entrySet()
+                                .ifPresentOrElse(joinedMethod -> methodDefinition.getMapping().object2ObjectEntrySet()
+                                        .forEach(methodDefinitionEntry -> joinedMethod.getMapping()
+                                                .object2ObjectEntrySet()
                                                 .stream()
-                                                .filter(entry -> entry.getValue().equals(s3) && entry.getKey().getValue() == mappingType)
+                                                .filter(entry -> entry.getValue().equals(methodDefinitionEntry.getValue()) && entry.getKey().getValue() == methodDefinitionEntry.getKey())
                                                 .findFirst()
                                                 .ifPresentOrElse(entry -> {
                                                             joinedMethod.getMapping().remove(entry.getKey());
                                                             joinedMethod.getMapping().put(Map.entry(entry.getKey().getKey() + "," + version, entry.getKey().getValue()), entry.getValue());
                                                         },
-                                                        () -> joinedMethod.getMapping().put(Map.entry(version, mappingType), s3))), () -> {
+                                                        () -> joinedMethod.getMapping().put(Map.entry(version, methodDefinitionEntry.getKey()), methodDefinitionEntry.getValue()))), () -> {
                                     var joinedMethod = new JoinedClassDefinition.JoinedMethod(remapParameterType(version, methodDefinition.getReturnType(), spigotForceMerge));
                                     methodDefinition.getMapping()
                                             .forEach((mappingType, s1) -> joinedMethod.getMapping().put(Map.entry(version, mappingType), s1));
                                     joinedMethod.getParameters().addAll(methodDefinition.getParameters()
                                             .stream()
                                             .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                            .collect(Collectors.toList()));
+                                            .collect(ObjectImmutableList.toList()));
 
                                     definition.getMethods().add(joinedMethod);
                                 });
@@ -258,7 +261,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
             var hash = spigotLinks.get(checkIfNewerSpigot);
 
             if (hash != null) {
-                // Yay, Mojang mappings are another but Spigot same so we assume it's same class
+                // Yay, Mojang mappings are another but Spigot same, so we assume it's same class
                 links.put(mojMap, hash);
                 classDefinition.setJoinedKey(hash);
                 return hash;
@@ -311,20 +314,20 @@ public abstract class JoinedMappingTask extends DefaultTask {
         return link;
     }
 
-    public boolean compareMappings(Map<Map.Entry<String, MappingType>, String> mapping, String anotherVersion, MappingType baseMappingType, Map<MappingType, String> versionSpecificMapping) {
+    public boolean compareMappings(Object2ObjectOpenHashMap<Map.Entry<String, MappingType>, String> mapping, String anotherVersion, MappingType baseMappingType, Object2ObjectOpenHashMap<MappingType, String> versionSpecificMapping) {
         return mapping
-                .entrySet()
+                .object2ObjectEntrySet()
                 .stream()
                 .filter(entry -> entry.getKey().getValue() == baseMappingType && Arrays.asList(entry.getKey().getKey().split(",")).contains(anotherVersion) && versionSpecificMapping.containsKey(entry.getKey().getValue()))
                 .findFirst()
                 .or(() ->
                         mapping
-                                .entrySet()
+                                .object2ObjectEntrySet()
                                 .stream()
                                 .filter(entry -> entry.getKey().getValue() == MappingType.SEARGE && Arrays.asList(entry.getKey().getKey().split(",")).contains(anotherVersion) && versionSpecificMapping.containsKey(entry.getKey().getValue()))
                                 .findFirst()
                                 .or(() -> mapping
-                                        .entrySet()
+                                        .object2ObjectEntrySet()
                                         .stream()
                                         .filter(entry -> entry.getKey().getValue() == MappingType.OBFUSCATED && Arrays.asList(entry.getKey().getKey().split(",")).contains(anotherVersion))
                                         .findFirst()

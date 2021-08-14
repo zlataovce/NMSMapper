@@ -21,6 +21,7 @@ dependencies {
     implementation 'net.minecraftforge:srgutils:0.4.3'
     implementation 'commons-io:commons-io:2.10.0'
     implementation 'com.jcraft:jsch:0.1.55'
+    implementation 'it.unimi.dsi:fastutil:8.5.4'
 }
 
 sourceCompatibility = '11.0'

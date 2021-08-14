@@ -1,7 +1,8 @@
 package org.screamingsandals.nms.mapper.single;
 
-import java.util.*;
-
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.Data;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -11,11 +12,11 @@ public class ClassDefinition {
     private int modifier;
     private Type type = Type.CLASS;
     private Link superclass = null;
-    private final List<Link> interfaces = new ArrayList<>();
-    private final Map<MappingType, String> mapping = new HashMap<>();
-    private final Map<String, FieldDefinition> fields = new HashMap<>();
-    private final List<MethodDefinition> methods = new ArrayList<>();
-    private final List<ConstructorDefinition> constructors = new ArrayList<>();
+    private final ObjectList<Link> interfaces = new ObjectArrayList<>();
+    private final Object2ObjectOpenHashMap<MappingType, String> mapping = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, FieldDefinition> fields = new Object2ObjectOpenHashMap<>();
+    private final ObjectList<MethodDefinition> methods = new ObjectArrayList<>();
+    private final ObjectList<ConstructorDefinition> constructors = new ObjectArrayList<>();
 
     private transient String joinedKey;
     private transient String pathKey;
@@ -24,21 +25,21 @@ public class ClassDefinition {
     public static class FieldDefinition {
         private int modifier;
         private final Link type;
-        private final Map<MappingType, String> mapping = new HashMap<>();
+        private final Object2ObjectOpenHashMap<MappingType, String> mapping = new Object2ObjectOpenHashMap<>();
     }
 
     @Data
     public static class MethodDefinition {
         private int modifier;
         private final Link returnType;
-        private final Map<MappingType, String> mapping = new HashMap<>();
-        private final List<Link> parameters = new ArrayList<>();
+        private final Object2ObjectOpenHashMap<MappingType, String> mapping = new Object2ObjectOpenHashMap<>();
+        private final ObjectList<Link> parameters = new ObjectArrayList<>();
     }
 
     @Data
     public static class ConstructorDefinition {
         private int modifier;
-        private final List<Link> parameters = new ArrayList<>();
+        private final ObjectList<Link> parameters = new ObjectArrayList<>();
     }
 
     @Data

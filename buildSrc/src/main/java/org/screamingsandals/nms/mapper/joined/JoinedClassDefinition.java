@@ -1,42 +1,43 @@
 package org.screamingsandals.nms.mapper.joined;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.Data;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
 import org.screamingsandals.nms.mapper.single.MappingType;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
 public class JoinedClassDefinition {
-    private final Map<Map.Entry<String, MappingType>, String> mapping = new HashMap<>();
-    private final List<JoinedField> fields = new ArrayList<>();
-    private final List<JoinedConstructor> constructors = new ArrayList<>();
-    private final List<JoinedMethod> methods = new ArrayList<>();
+    private final Object2ObjectOpenHashMap<Map.Entry<String, MappingType>, String> mapping = new Object2ObjectOpenHashMap<>();
+    private final ObjectList<JoinedField> fields = new ObjectArrayList<>();
+    private final ObjectList<JoinedConstructor> constructors = new ObjectArrayList<>();
+    private final ObjectList<JoinedMethod> methods = new ObjectArrayList<>();
 
-    private transient final Map<String, String> pathKeys = new HashMap<>();
+    private transient final Object2ObjectMap<String, String> pathKeys = new Object2ObjectOpenHashMap<>();
 
     @Data
     public static class JoinedField {
         private final ClassDefinition.Link type;
-        private final Map<Map.Entry<String, MappingType>, String> mapping = new HashMap<>();
+        private final Object2ObjectOpenHashMap<Map.Entry<String, MappingType>, String> mapping = new Object2ObjectOpenHashMap<>();
     }
 
     @Data
     public static class JoinedConstructor {
-        private final List<ClassDefinition.Link> parameters = new ArrayList<>();
-        private final List<String> supportedVersions = new ArrayList<>();
+        private final ObjectList<ClassDefinition.Link> parameters = new ObjectArrayList<>();
+        private final ObjectList<String> supportedVersions = new ObjectArrayList<>();
     }
 
     @Data
     public static class JoinedMethod {
         private final ClassDefinition.Link returnType;
-        private final Map<Map.Entry<String, MappingType>, String> mapping = new HashMap<>();
-        private final List<ClassDefinition.Link> parameters = new ArrayList<>();
+        private final Object2ObjectOpenHashMap<Map.Entry<String, MappingType>, String> mapping = new Object2ObjectOpenHashMap<>();
+        private final ObjectList<ClassDefinition.Link> parameters = new ObjectArrayList<>();
     }
 
     // TODO: figure out how to do custom serializer (configurate is refusing to do anything for some reason)

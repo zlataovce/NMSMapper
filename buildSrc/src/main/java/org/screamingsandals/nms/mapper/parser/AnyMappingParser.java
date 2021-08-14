@@ -1,5 +1,7 @@
 package org.screamingsandals.nms.mapper.parser;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraftforge.srgutils.IMappingFile;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
 import org.screamingsandals.nms.mapper.single.MappingType;
@@ -8,16 +10,13 @@ import org.screamingsandals.nms.mapper.utils.ErrorsLogger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class AnyMappingParser {
-    public static void map(Map<String, ClassDefinition> map, InputStream inputStream, List<String> excluded, MappingType mappingType, boolean inverted, ErrorsLogger errorsLogger) throws IOException {
+    public static void map(Object2ObjectOpenHashMap<String, ClassDefinition> map, InputStream inputStream, ObjectList<String> excluded, MappingType mappingType, boolean inverted, ErrorsLogger errorsLogger) throws IOException {
         var mappingFile = IMappingFile.load(inputStream);
 
-        var invertedBuffer = new HashMap<String, String>();
+        var invertedBuffer = new Object2ObjectOpenHashMap<String, String>();
         if (inverted) {
             mappingFile.getClasses().forEach(iClass ->
                     invertedBuffer.put(iClass.getOriginal().replace("/", "."), iClass.getMapped().replace("/", "."))
@@ -49,7 +48,7 @@ public class AnyMappingParser {
                                 return; // Ignoring constructors
                             }
 
-                            // for some reason srgutils can't parse arguments and I don't know why
+                            // for some reason srgutils can't parse arguments, and I don't know why
                             var iMethodOriginal = inverted ? iMethod.getMapped() : iMethod.getOriginal();
                             var iMethodMapped = inverted ? iMethod.getOriginal() : iMethod.getMapped();
 

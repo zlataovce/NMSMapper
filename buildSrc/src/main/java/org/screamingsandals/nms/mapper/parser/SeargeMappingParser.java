@@ -1,5 +1,7 @@
 package org.screamingsandals.nms.mapper.parser;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.screamingsandals.nms.mapper.extension.Version;
 import org.screamingsandals.nms.mapper.single.ClassDefinition;
 import org.screamingsandals.nms.mapper.single.MappingType;
@@ -14,7 +16,7 @@ import java.util.Objects;
 import java.util.zip.ZipFile;
 
 public class SeargeMappingParser {
-    public static String map(Map<String, ClassDefinition> map, Version version, List<String> excluded, ErrorsLogger errorsLogger) throws IOException, InterruptedException, URISyntaxException {
+    public static String map(Object2ObjectOpenHashMap<String, ClassDefinition> map, Version version, ObjectList<String> excluded, ErrorsLogger errorsLogger) throws IOException, InterruptedException, URISyntaxException {
         var mcpZip = version.getWorkspace().getFile(Objects.requireNonNull(version.getSeargeMappings()), "mcp.zip");
 
         try (var zip = new ZipFile(mcpZip)) {
