@@ -66,7 +66,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
 
             System.out.println("Applying version " + version);
 
-            mappings.get(version).object2ObjectEntrySet().forEach(mappingsEntry -> {
+            mappings.get(version).object2ObjectEntrySet().fastForEach(mappingsEntry -> {
                 var classDefinition = mappingsEntry.getValue();
                 try {
                     var finalClassName = getJoinedClassName(classDefinition, spigotForceMerge);
