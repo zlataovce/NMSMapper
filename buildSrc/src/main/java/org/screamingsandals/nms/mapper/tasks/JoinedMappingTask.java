@@ -2,6 +2,7 @@ package org.screamingsandals.nms.mapper.tasks;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.SneakyThrows;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Property;
@@ -171,7 +172,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
         });
     }
 
-    public String getJoinedClassName(ClassDefinition classDefinition, List<String> spigotForceMerge) throws DigestException {
+    public String getJoinedClassName(ClassDefinition classDefinition, ObjectList<String> spigotForceMerge) throws DigestException {
         if (classDefinition.getJoinedKey() != null) {
             return classDefinition.getJoinedKey();
         }
@@ -297,7 +298,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
     }
 
     @SneakyThrows
-    public ClassDefinition.Link remapParameterType(String version, ClassDefinition.Link link, List<String> spigotForceMerge) {
+    public ClassDefinition.Link remapParameterType(String version, ClassDefinition.Link link, ObjectList<String> spigotForceMerge) {
         if (link.isNms()) {
             var type = link.getType();
             var suffix = new StringBuilder();
