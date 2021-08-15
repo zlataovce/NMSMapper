@@ -50,7 +50,7 @@ public abstract class SaveMappingsTask extends DefaultTask {
 
         var mainNode = saver.createNode();
 
-        getUtils().get().getJoinedMappings().object2ObjectEntrySet().forEach(joinedMappingEntry -> {
+        getUtils().get().getJoinedMappings().object2ObjectEntrySet().fastForEach(joinedMappingEntry -> {
             var k = joinedMappingEntry.getKey();
             var v = joinedMappingEntry.getValue();
             try {

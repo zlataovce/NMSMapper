@@ -1,7 +1,7 @@
 package org.screamingsandals.nms.mapper.tasks;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.SneakyThrows;
 import org.gradle.api.DefaultTask;
@@ -21,7 +21,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 public abstract class JoinedMappingTask extends DefaultTask {
@@ -47,13 +46,13 @@ public abstract class JoinedMappingTask extends DefaultTask {
                     .stream()
                     .map(String::trim)
                     .filter(s -> !s.isBlank() && !s.startsWith("#"))
-                    .collect(ObjectImmutableList.toList());
+                    .collect(ObjectArrayList.toList());
 
         var versions = getUtils().get().getNewlyGeneratedMappings()
                 .keySet()
                 .stream()
                 .sorted(Comparator.comparing(VersionNumber::parse).reversed())
-                .collect(ObjectImmutableList.toList());
+                .collect(ObjectArrayList.toList());
 
         var mappings = getUtils().get().getMappings();
 
@@ -90,7 +89,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
                             .filter(joinedConstructor -> constructorDefinition.getParameters()
                                     .stream()
                                     .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                    .collect(ObjectImmutableList.toList())
+                                    .collect(ObjectArrayList.toList())
                                     .equals(joinedConstructor.getParameters())
                             )
                             .findFirst()
@@ -100,7 +99,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                 constructor.getParameters().addAll(constructorDefinition.getParameters()
                                         .stream()
                                         .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                        .collect(ObjectImmutableList.toList()));
+                                        .collect(ObjectArrayList.toList()));
                                 definition.getConstructors().add(constructor);
                             }));
 
@@ -140,7 +139,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                         && methodDefinition.getParameters()
                                         .stream()
                                         .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                        .collect(ObjectImmutableList.toList())
+                                        .collect(ObjectArrayList.toList())
                                         .equals(joinedMethod.getParameters()))
                                 .findFirst()
                                 .ifPresentOrElse(joinedMethod -> methodDefinition.getMapping().object2ObjectEntrySet()
@@ -160,7 +159,7 @@ public abstract class JoinedMappingTask extends DefaultTask {
                                     joinedMethod.getParameters().addAll(methodDefinition.getParameters()
                                             .stream()
                                             .map(link -> remapParameterType(version, link, spigotForceMerge))
-                                            .collect(ObjectImmutableList.toList()));
+                                            .collect(ObjectArrayList.toList()));
 
                                     definition.getMethods().add(joinedMethod);
                                 });

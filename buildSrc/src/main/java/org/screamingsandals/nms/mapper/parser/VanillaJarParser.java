@@ -2,7 +2,6 @@ package org.screamingsandals.nms.mapper.parser;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.generic.Type;
@@ -11,7 +10,9 @@ import org.screamingsandals.nms.mapper.single.MappingType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -34,7 +35,7 @@ public class VanillaJarParser {
                     .filter(Objects::nonNull)
                     .filter(e -> !e.isAnonymous() && !e.isSynthetic())
                     .filter(e -> !e.getClassName().equals("net.minecraft.data.Main")) // net.minecraft.data.Main is excluded from custom servers
-                    .collect(ObjectImmutableList.toList());
+                    .collect(ObjectArrayList.toList());
 
             entries.forEach(javaClass -> {
                 var definition = new ClassDefinition();
